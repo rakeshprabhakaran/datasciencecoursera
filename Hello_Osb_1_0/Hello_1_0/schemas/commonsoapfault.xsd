@@ -1,0 +1,20 @@
+<schema targetNamespace="http://schemas.xmlsoap.org/soap/envelope/" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xhd="http://soa.o2.co.uk/hellodata_1">
+
+	<import namespace="http://soa.o2.co.uk/hellodata_1" schemaLocation="../../NorthBoundInterfaces/hellodata_1_0.xsd"/>
+	<element name="Fault" type="soapenv:Fault"/>
+
+	<complexType name="Fault">
+		<sequence>
+			<element name="faultcode" type="string"/>
+			<element name="faultstring" type="string"/>
+			<element name="detail" type="soapenv:detail"/>
+		</sequence>
+	</complexType>
+
+	<complexType name="detail">
+		<choice>
+			<element ref="xhd:testFaultFault"/>
+			<element ref="xhd:testHelloFault"/>
+		</choice>
+	</complexType>
+</schema>
