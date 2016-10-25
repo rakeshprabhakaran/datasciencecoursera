@@ -1,0 +1,68 @@
+<!--
+	
+	***** IMPORTANT NOTE TO THE DEVELOPER: *****
+	
+	If you get the following ERROR(s):
+	
+		esb_build.xml:19: taskdef class uk.co.o2.esb.build.anttask.ESBReleasePackager cannot be found OR
+		java.lang.NoClassDefFoundError: org/custommonkey/xmlunit/Diff
+		
+	Read the Wiki Article to know how to download the above custom ANT Task (and its deps) and setup your Ant Environment:
+	
+	http://devo2.dev.o2.co.uk:18080/confluence/display/SF/ALSB+Ant+Build+Script
+	
+	_________________________________________________________________________________
+	
+	Should be run from the directory:
+	
+	SVN_CHECKOUT_DIR/alsb/MyService/MyService_1_0
+	
+	Run ant as follows:
+	
+	ant -f ..\..\ESB_BUILD\esb_build.xml
+	
+-->
+<project name="Generic ESB Service Build and Release" default="build" basedir=".">
+   
+  <taskdef name="esbReleaseGen" classname="uk.co.o2.esb.build.anttask.ESBReleasePackager"/>
+  
+  <!--  
+      - Default/Nightly Build 
+      - Verifies if output/MyService.jar exists
+      - Compares contents outside the directory with that of Jar
+      - Fails the packaging if files are out-of-sync
+      - Packages all files
+      - Creates nightly build release MyService_release_yyyymmdd.zip
+      - Generates Release Manifest
+  -->
+    
+  <target name="build">
+    	<esbReleaseGen buildtype="nightly"/>
+  </target>
+  
+
+
+
+
+  <!--
+      - Verifies if output/MyService.jar exists
+      - Compares contents outside the directory with that of Jar
+      - Fails the packaging if files are out-of-sync
+      - Packages all files
+      - Creates a release build - MyService_release_major_minor_buildnumber.zip
+      - Generates Release Manifest
+  --> 
+
+  <target name="release">
+    	<esbReleaseGen buildtype="release"/>
+  </target>
+
+
+  <target name="clean">
+  	<delete failonerror="false">
+  	  <fileset dir="dist" includes="**/*"/>
+ 	 </delete>
+  	<delete dir="dist" />	
+  </target>	
+  
+</project>
