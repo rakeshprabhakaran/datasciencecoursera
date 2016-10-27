@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml-fragment>
+  <ser:coreEntry isProxy="true" isEnabled="true" xmlns:ser="http://www.bea.com/wli/sb/services">
+    <ser:description>Hello service used to validate consumer platforms connections and validate consumer platforms can handle SOA faults</ser:description>
+    <ser:binding type="SOAP" isSoap12="false" xsi:type="con:SoapBindingType" xmlns:con="http://www.bea.com/wli/sb/services/bindings/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <con:wsdl ref="NorthBoundInterfaces/helloservice_1_0"/>
+      <con:port>
+        <con:name>HelloPort</con:name>
+        <con:namespace>http://soa.o2.co.uk/helloservice_1</con:namespace>
+      </con:port>
+      <con:selector type="SOAP body"/>
+    </ser:binding>
+    <ser:monitoring isEnabled="false">
+      <ser:aggregationInterval>10</ser:aggregationInterval>
+      <ser:pipelineMonitoringLevel>Pipeline</ser:pipelineMonitoringLevel>
+    </ser:monitoring>
+    <ser:reporting>true</ser:reporting>
+    <ser:logging isEnabled="true">
+      <ser:logLevel>debug</ser:logLevel>
+    </ser:logging>
+    <ser:sla-alerting isEnabled="true">
+      <ser:alertLevel>normal</ser:alertLevel>
+    </ser:sla-alerting>
+    <ser:pipeline-alerting isEnabled="true">
+      <ser:alertLevel>normal</ser:alertLevel>
+    </ser:pipeline-alerting>
+    <ser:ws-policy>
+      <ser:binding-mode>wsdl-policy-attachments</ser:binding-mode>
+    </ser:ws-policy>
+  </ser:coreEntry>
+  <ser:endpointConfig xmlns:ser="http://www.bea.com/wli/sb/services">
+    <tran:provider-id xmlns:tran="http://www.bea.com/wli/sb/transports">http</tran:provider-id>
+    <tran:inbound xmlns:tran="http://www.bea.com/wli/sb/transports">true</tran:inbound>
+    <tran:URI xmlns:tran="http://www.bea.com/wli/sb/transports">
+      <env:value xmlns:env="http://www.bea.com/wli/config/env">/services/Hello_1_0</env:value>
+    </tran:URI>
+    <tran:inbound-properties xmlns:tran="http://www.bea.com/wli/sb/transports"/>
+    <tran:all-headers xmlns:tran="http://www.bea.com/wli/sb/transports">false</tran:all-headers>
+    <tran:provider-specific xmlns:tran="http://www.bea.com/wli/sb/transports">
+      <http:inbound-properties xmlns:http="http://www.bea.com/wli/sb/transports/http"/>
+    </tran:provider-specific>
+  </ser:endpointConfig>
+  <ser:router errorHandler="_onErrorHandler-7979769518289812228--16e8d2f4.11d0a9c341b.-7fec" xmlns:ser="http://www.bea.com/wli/sb/services">
+    <con:pipeline type="request" name="TestFault Gateway_request" xmlns:con="http://www.bea.com/wli/sb/pipeline/config">
+      <con:stage name="Logging Request">
+        <con:comment>Logs the inbound,header,body of request.</con:comment>
+        <con:context/>
+        <con:actions>
+          <con1:javaCallout varName="header" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+            <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-4890565618970977189--4f0dc14d.11c6f28da90.-8000</con2:id>
+            <con1:archive ref="Utility/o2framework/o2framework"/>
+            <con1:className>uk.co.o2.soa.sf.o2fwk.impl.O2Framework</con1:className>
+            <con1:method>public static org.apache.xmlbeans.XmlObject logEntry(org.apache.xmlbeans.XmlObject, org.apache.xmlbeans.XmlObject, org.apache.xmlbeans.XmlObject)</con1:method>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$inbound</con2:xqueryText>
+            </con1:expr>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$header</con2:xqueryText>
+            </con1:expr>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$body</con2:xqueryText>
+            </con1:expr>
+          </con1:javaCallout>
+        </con:actions>
+      </con:stage>
+      <con:stage name="Validate TestFault Request">
+        <con:comment>Validate the incoming Test Fault message</con:comment>
+        <con:context>
+          <con1:varNsDecl namespace="http://soa.o2.co.uk/hellodata_1" prefix="hel" xmlns:con1="http://www.bea.com/wli/sb/stages/config"/>
+        </con:context>
+        <con:actions>
+          <con1:validate xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+            <con2:comment xmlns:con2="http://www.bea.com/wli/sb/stages/config">Validate the incomming request</con2:comment>
+            <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-401283064185605727-3eb84d42.11a9fd10ce4.-7ff8</con2:id>
+            <con1:schema ref="NorthBoundInterfaces/hellodata_1_0"/>
+            <con1:schemaElement xmlns:hel="http://soa.o2.co.uk/hellodata_1">hel:testFault</con1:schemaElement>
+            <con1:varName>body</con1:varName>
+            <con1:location>
+              <con2:xpathText xmlns:con2="http://www.bea.com/wli/sb/stages/config">./hel:testFault</con2:xpathText>
+            </con1:location>
+          </con1:validate>
+        </con:actions>
+      </con:stage>
+      <con:stage name="Raise Error" errorHandler="_onErrorHandler-401283064185605727-3eb84d42.11a9fd10ce4.-7fda">
+        <con:comment>Raise Error</con:comment>
+        <con:context/>
+        <con:actions>
+          <con1:Error xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+            <con2:comment xmlns:con2="http://www.bea.com/wli/sb/stages/config">Raise the Error to generate SOAP response</con2:comment>
+            <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-401283064185605727-3eb84d42.11a9fd10ce4.-7fdb</con2:id>
+            <con1:errCode>000</con1:errCode>
+            <con1:message>Raise the error to generate the Fault message</con1:message>
+          </con1:Error>
+        </con:actions>
+      </con:stage>
+    </con:pipeline>
+    <con:pipeline type="response" name="TestFault Gateway_response" xmlns:con="http://www.bea.com/wli/sb/pipeline/config">
+      <con:stage name="Logging Response">
+        <con:comment>Logs the inbound,header,body of response.</con:comment>
+        <con:context/>
+        <con:actions>
+          <con1:javaCallout varName="header" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+            <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-4890565618970977189--4f0dc14d.11c6f28da90.-7fff</con2:id>
+            <con1:archive ref="Utility/o2framework/o2framework"/>
+            <con1:className>uk.co.o2.soa.sf.o2fwk.impl.O2Framework</con1:className>
+            <con1:method>public static org.apache.xmlbeans.XmlObject logExit(org.apache.xmlbeans.XmlObject, org.apache.xmlbeans.XmlObject, org.apache.xmlbeans.XmlObject)</con1:method>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$inbound</con2:xqueryText>
+            </con1:expr>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$header</con2:xqueryText>
+            </con1:expr>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$body</con2:xqueryText>
+            </con1:expr>
+          </con1:javaCallout>
+        </con:actions>
+      </con:stage>
+    </con:pipeline>
+    <con:pipeline type="request" name="TestHello Gateway_request" xmlns:con="http://www.bea.com/wli/sb/pipeline/config">
+      <con:stage name="Logging Request">
+        <con:comment>Logs the inbound,header,body of request.</con:comment>
+        <con:context/>
+        <con:actions>
+          <con1:javaCallout varName="header" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+            <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-3629119818835272596--44fef936.149d24b9df6.-8000</con2:id>
+            <con1:archive ref="Utility/o2framework/o2framework"/>
+            <con1:className>uk.co.o2.soa.sf.o2fwk.impl.O2Framework</con1:className>
+            <con1:method>public static org.apache.xmlbeans.XmlObject logEntry(org.apache.xmlbeans.XmlObject, org.apache.xmlbeans.XmlObject, org.apache.xmlbeans.XmlObject)</con1:method>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$inbound</con2:xqueryText>
+            </con1:expr>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$header</con2:xqueryText>
+            </con1:expr>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$body</con2:xqueryText>
+            </con1:expr>
+          </con1:javaCallout>
+        </con:actions>
+      </con:stage>
+      <con:stage name="Validating Hello Request">
+        <con:comment>Validate testHello element with the nothbound XSD.</con:comment>
+        <con:context>
+          <con1:varNsDecl namespace="http://soa.o2.co.uk/hellodata_1" prefix="hel" xmlns:con1="http://www.bea.com/wli/sb/stages/config"/>
+        </con:context>
+        <con:actions>
+          <con1:validate xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+            <con2:comment xmlns:con2="http://www.bea.com/wli/sb/stages/config">Validate the incomming request</con2:comment>
+            <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-401283064185605727-3eb84d42.11a9fd10ce4.-7ff4</con2:id>
+            <con1:schema ref="NorthBoundInterfaces/hellodata_1_0"/>
+            <con1:schemaElement xmlns:hel="http://soa.o2.co.uk/hellodata_1">hel:testHello</con1:schemaElement>
+            <con1:varName>body</con1:varName>
+            <con1:location>
+              <con2:xpathText xmlns:con2="http://www.bea.com/wli/sb/stages/config">./hel:testHello</con2:xpathText>
+            </con1:location>
+          </con1:validate>
+        </con:actions>
+      </con:stage>
+    </con:pipeline>
+    <con:pipeline type="response" name="TestHello Gateway_response" xmlns:con="http://www.bea.com/wli/sb/pipeline/config">
+      <con:stage name="Generate Response">
+        <con:comment>Generate Response Hello message</con:comment>
+        <con:context>
+          <con1:varNsDecl namespace="http://soa.o2.co.uk/hellodata_1" prefix="hel" xmlns:con1="http://www.bea.com/wli/sb/stages/config"/>
+        </con:context>
+        <con:actions>
+          <con1:javaCallout varName="configData" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+            <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-7824847546425034266-6588c5a2.11d041493ad.-7fef</con2:id>
+            <con1:archive ref="Utility/configdatamanagement/configdatamanagement"/>
+            <con1:className>uk.co.o2.soa.sf.xmldata.parsing.impl.ConfigFileManager</con1:className>
+            <con1:method>public static java.lang.String retreiveServiceData(org.apache.xmlbeans.XmlObject)</con1:method>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$inbound</con2:xqueryText>
+            </con1:expr>
+          </con1:javaCallout>
+          <con1:replace varName="body" contents-only="true" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+            <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-7979769518289812228--16e8d2f4.11d0a9c341b.-7feb</con2:id>
+            <con1:location>
+              <con2:xpathText xmlns:con2="http://www.bea.com/wli/sb/stages/config">.</con2:xpathText>
+            </con1:location>
+            <con1:expr>
+              <con2:xqueryTransform xmlns:con2="http://www.bea.com/wli/sb/stages/config">
+                <con2:resource ref="Hello_1_0/transformations/TestHelloResponse"/>
+                <con2:param name="message">
+                  <con2:path>data(fn-bea:inlinedXML($configData)/message)</con2:path>
+                </con2:param>
+                <con2:param name="testHello1">
+                  <con2:path>$body/hel:testHello</con2:path>
+                </con2:param>
+              </con2:xqueryTransform>
+            </con1:expr>
+          </con1:replace>
+        </con:actions>
+      </con:stage>
+      <con:stage name="Logging Response">
+        <con:comment>Logs the inbound,header,body of response.</con:comment>
+        <con:context/>
+        <con:actions>
+          <con1:javaCallout varName="header" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+            <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-7824847546425034266-6588c5a2.11d041493ad.-7feb</con2:id>
+            <con1:archive ref="Utility/o2framework/o2framework"/>
+            <con1:className>uk.co.o2.soa.sf.o2fwk.impl.O2Framework</con1:className>
+            <con1:method>public static org.apache.xmlbeans.XmlObject logExit(org.apache.xmlbeans.XmlObject, org.apache.xmlbeans.XmlObject, org.apache.xmlbeans.XmlObject)</con1:method>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$inbound</con2:xqueryText>
+            </con1:expr>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$header</con2:xqueryText>
+            </con1:expr>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$body</con2:xqueryText>
+            </con1:expr>
+          </con1:javaCallout>
+        </con:actions>
+      </con:stage>
+    </con:pipeline>
+    <con:pipeline type="error" name="_onErrorHandler-401283064185605727-3eb84d42.11a9fd10ce4.-7fda" xmlns:con="http://www.bea.com/wli/sb/pipeline/config">
+      <con:stage name="Construct Fault Message">
+        <con:comment>Construct Fault Message</con:comment>
+        <con:context>
+          <con1:userNsDecl namespace="http://soa.o2.co.uk/hellodata_1" prefix="xhd" xmlns:con1="http://www.bea.com/wli/sb/stages/config"/>
+          <con1:userNsDecl namespace="http://soa.o2.co.uk/coredata_1" prefix="cor" xmlns:con1="http://www.bea.com/wli/sb/stages/config"/>
+          <con1:varNsDecl namespace="http://soa.o2.co.uk/hellodata_1" prefix="hel" xmlns:con1="http://www.bea.com/wli/sb/stages/config"/>
+        </con:context>
+        <con:actions>
+          <con1:javaCallout varName="configData" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+            <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-7824847546425034266-6588c5a2.11d041493ad.-7ff4</con2:id>
+            <con1:archive ref="Utility/configdatamanagement/configdatamanagement"/>
+            <con1:className>uk.co.o2.soa.sf.xmldata.parsing.impl.ConfigFileManager</con1:className>
+            <con1:method>public static java.lang.String retreiveServiceData(org.apache.xmlbeans.XmlObject)</con1:method>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$inbound</con2:xqueryText>
+            </con1:expr>
+          </con1:javaCallout>
+          <con1:replace varName="body" contents-only="true" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+            <con2:comment xmlns:con2="http://www.bea.com/wli/sb/stages/config">Replace the Body contents with SOAP ffault message</con2:comment>
+            <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-401283064185605727-3eb84d42.11a9fd10ce4.-7fd9</con2:id>
+            <con1:location>
+              <con2:xpathText xmlns:con2="http://www.bea.com/wli/sb/stages/config">.</con2:xpathText>
+            </con1:location>
+            <con1:expr>
+              <con2:xqueryTransform xmlns:con2="http://www.bea.com/wli/sb/stages/config">
+                <con2:resource ref="Hello_1_0/transformations/TestFaultFaultResponse"/>
+                <con2:param name="transId">
+                  <con2:path>data($header/cor:SOATransactionID)</con2:path>
+                </con2:param>
+                <con2:param name="configData">
+                  <con2:path>fn-bea:inlinedXML($configData)</con2:path>
+                </con2:param>
+                <con2:param name="testFault1">
+                  <con2:path>$body/hel:testFault</con2:path>
+                </con2:param>
+              </con2:xqueryTransform>
+            </con1:expr>
+          </con1:replace>
+          <con1:javaCallout varName="header" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+            <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-646801510733663424--153af913.11c9289c69b.-7ffc</con2:id>
+            <con1:archive ref="Utility/o2framework/o2framework"/>
+            <con1:className>uk.co.o2.soa.sf.o2fwk.impl.O2Framework</con1:className>
+            <con1:method>public static org.apache.xmlbeans.XmlObject logFault(org.apache.xmlbeans.XmlObject, org.apache.xmlbeans.XmlObject, org.apache.xmlbeans.XmlObject, java.lang.String)</con1:method>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$inbound</con2:xqueryText>
+            </con1:expr>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$header</con2:xqueryText>
+            </con1:expr>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$body</con2:xqueryText>
+            </con1:expr>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">data($body/soap-env:Fault/detail/*/cor:SOAFaultCode)</con2:xqueryText>
+            </con1:expr>
+          </con1:javaCallout>
+          <con1:reply isError="true" xmlns:con1="http://www.bea.com/wli/sb/stages/config">
+            <con1:comment>Reply to calling system with message</con1:comment>
+            <con1:id>_ActionId-401283064185605727-3eb84d42.11a9fd10ce4.-7fd8</con1:id>
+          </con1:reply>
+        </con:actions>
+      </con:stage>
+    </con:pipeline>
+    <con:pipeline type="error" name="_onErrorHandler-7979769518289812228--16e8d2f4.11d0a9c341b.-7fec" xmlns:con="http://www.bea.com/wli/sb/pipeline/config">
+      <con:stage name="Generic Exception Handling">
+        <con:comment>Handles all the validation errors and any proxy service implementation errors</con:comment>
+        <con:context>
+          <con1:userNsDecl namespace="http://soa.o2.co.uk/hellodata_1" prefix="xhd" xmlns:con1="http://www.bea.com/wli/sb/stages/config"/>
+          <con1:userNsDecl namespace="http://soa.o2.co.uk/coredata_1" prefix="cor" xmlns:con1="http://www.bea.com/wli/sb/stages/config"/>
+          <con1:varNsDecl namespace="http://soa.o2.co.uk/hellodata_1" prefix="hel" xmlns:con1="http://www.bea.com/wli/sb/stages/config"/>
+        </con:context>
+        <con:actions>
+          <con1:replace varName="body" contents-only="true" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+            <con2:comment xmlns:con2="http://www.bea.com/wli/sb/stages/config">Replace the Body contents with SOAP ffault message</con2:comment>
+            <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-7979769518289812228--16e8d2f4.11d0a9c341b.-7fef</con2:id>
+            <con1:location>
+              <con2:xpathText xmlns:con2="http://www.bea.com/wli/sb/stages/config">.</con2:xpathText>
+            </con1:location>
+            <con1:expr>
+              <con2:xqueryTransform xmlns:con2="http://www.bea.com/wli/sb/stages/config">
+                <con2:resource ref="Hello_1_0/transformations/AlsbFaultToHelloFault"/>
+                <con2:param name="operationName">
+                  <con2:path>$operation</con2:path>
+                </con2:param>
+                <con2:param name="fault1">
+                  <con2:path>$fault</con2:path>
+                </con2:param>
+                <con2:param name="transactionId">
+                  <con2:path>data($header/cor:SOATransactionID)</con2:path>
+                </con2:param>
+              </con2:xqueryTransform>
+            </con1:expr>
+          </con1:replace>
+          <con1:javaCallout varName="header" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+            <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-7979769518289812228--16e8d2f4.11d0a9c341b.-7fee</con2:id>
+            <con1:archive ref="Utility/o2framework/o2framework"/>
+            <con1:className>uk.co.o2.soa.sf.o2fwk.impl.O2Framework</con1:className>
+            <con1:method>public static org.apache.xmlbeans.XmlObject logFault(org.apache.xmlbeans.XmlObject, org.apache.xmlbeans.XmlObject, org.apache.xmlbeans.XmlObject, java.lang.String)</con1:method>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$inbound</con2:xqueryText>
+            </con1:expr>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$header</con2:xqueryText>
+            </con1:expr>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">$body</con2:xqueryText>
+            </con1:expr>
+            <con1:expr>
+              <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">data($body/soap-env:Fault/detail/*/cor:SOAFaultCode)</con2:xqueryText>
+            </con1:expr>
+          </con1:javaCallout>
+          <con1:reply isError="true" xmlns:con1="http://www.bea.com/wli/sb/stages/config">
+            <con1:comment>Reply to calling system with message</con1:comment>
+            <con1:id>_ActionId-7979769518289812228--16e8d2f4.11d0a9c341b.-7fed</con1:id>
+          </con1:reply>
+        </con:actions>
+      </con:stage>
+    </con:pipeline>
+    <con:flow xmlns:con="http://www.bea.com/wli/sb/pipeline/config">
+      <con:branch-node type="operation" name="Hello_1_0  Branch">
+        <con:comment>This service used to validate consumer platforms connections and validate consumer platforms can handle SOA faults</con:comment>
+        <con:context/>
+        <con:branch-table>
+          <con:branch name="testFault">
+            <con:operator>equals</con:operator>
+            <con:value/>
+            <con:flow>
+              <con:pipeline-node name="TestFault Gateway">
+                <con:comment>This operation accepts a name as request and returns the soap fault as response by raising an error.</con:comment>
+                <con:request>TestFault Gateway_request</con:request>
+                <con:response>TestFault Gateway_response</con:response>
+              </con:pipeline-node>
+            </con:flow>
+          </con:branch>
+          <con:branch name="testHello">
+            <con:operator>equals</con:operator>
+            <con:value/>
+            <con:flow>
+              <con:pipeline-node name="TestHello Gateway">
+                <con:comment>This operation accepts a name as request and returns a "Hello name" message to the caller.</con:comment>
+                <con:request>TestHello Gateway_request</con:request>
+                <con:response>TestHello Gateway_response</con:response>
+              </con:pipeline-node>
+            </con:flow>
+          </con:branch>
+          <con:default-branch>
+            <con:flow/>
+          </con:default-branch>
+        </con:branch-table>
+      </con:branch-node>
+    </con:flow>
+  </ser:router>
+</xml-fragment>
