@@ -1,0 +1,5 @@
+<Hello_1_0>
+	<message>Hello</message>	
+	<faultcode>100</faultcode>
+	<faultDescription>Fault Message</faultDescription>
+</Hello_1_0>
